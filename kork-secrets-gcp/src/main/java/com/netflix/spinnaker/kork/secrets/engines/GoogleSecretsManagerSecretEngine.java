@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 OpsMx, Inc.
+ * Copyright 2022 OpsMx, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -68,11 +68,11 @@ public class GoogleSecretsManagerSecretEngine implements SecretEngine {
     Set<String> paramNamesSet = encryptedSecret.getParams().keySet();
     if (!paramNamesSet.contains(PROJECT_NUMBER)) {
       throw new InvalidSecretFormatException(
-        "Project number parameter is missing (" + PROJECT_NUMBER + "=...)");
+          "Project number parameter is missing (" + PROJECT_NUMBER + "=...)");
     }
     if (!paramNamesSet.contains(SECRET_ID)) {
       throw new InvalidSecretFormatException(
-        "Secret id parameter is missing (" + SECRET_ID + "=...)");
+          "Secret id parameter is missing (" + SECRET_ID + "=...)");
     }
     if (encryptedSecret.isEncryptedFile() && paramNamesSet.contains(SECRET_KEY)) {
       throw new InvalidSecretFormatException("Encrypted file should not specify key");
@@ -83,15 +83,15 @@ public class GoogleSecretsManagerSecretEngine implements SecretEngine {
     try {
       SecretManagerServiceClient client = SecretManagerServiceClient.create();
       SecretVersionName secretVersionName =
-        SecretVersionName.of(projectNumber, secretId, VERSION_ID);
+          SecretVersionName.of(projectNumber, secretId, VERSION_ID);
       AccessSecretVersionResponse response = client.accessSecretVersion(secretVersionName);
       return response.getPayload();
     } catch (IOException | ApiException e) {
       throw new SecretException(
-        String.format(
-          "Failed to parse secret when using Google Secrets Manager to fetch: [projectNumber: %s, secretId: %s]",
-          projectNumber, secretId),
-        e);
+          String.format(
+              "Failed to parse secret when using Google Secrets Manager to fetch: [projectNumber: %s, secretId: %s]",
+              projectNumber, secretId),
+          e);
     }
   }
 
@@ -108,20 +108,20 @@ public class GoogleSecretsManagerSecretEngine implements SecretEngine {
         cache.put(secretId, map);
       } catch (JsonProcessingException | IllegalArgumentException e) {
         throw new SecretException(
-          String.format(
-            "Failed to parse secret when using Google Secrets Manager to fetch: [projectNumber: %s, secretId: %s]",
-            projectNumber, secretId, secretKey),
-          e);
+            String.format(
+                "Failed to parse secret when using Google Secrets Manager to fetch: [projectNumber: %s, secretId: %s]",
+                projectNumber, secretId, secretKey),
+            e);
       }
     }
     return Optional.ofNullable(cache.get(secretId).get(secretKey))
-      .orElseThrow(
-        () ->
-          new SecretException(
-            String.format(
-              "Specified key not found in Google Secrets Manager: [projectNumber: %s, secretId: %s, secretKey: %s]",
-              projectNumber, secretId, secretKey)))
-      .getBytes();
+        .orElseThrow(
+            () ->
+                new SecretException(
+                    String.format(
+                        "Specified key not found in Google Secrets Manager: [projectNumber: %s, secretId: %s, secretKey: %s]",
+                        projectNumber, secretId, secretKey)))
+        .getBytes();
   }
 
   private byte[] getSecretPayloadString(String projectNumber, String secretId) {

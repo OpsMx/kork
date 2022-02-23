@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 OpsMx, Inc.
+ * Copyright 2022 OpsMx, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,30 +35,30 @@ public class GoogleSecretsManagerSecretEngineTest {
 
   @Spy
   private GoogleSecretsManagerSecretEngine googleSecretsManagerSecretEngine =
-    new GoogleSecretsManagerSecretEngine();
+      new GoogleSecretsManagerSecretEngine();
 
   @Rule public ExpectedException exceptionRule = ExpectedException.none();
 
   private SecretPayload minioAccessKeyId =
-    SecretPayload.newBuilder()
-      .setData(ByteString.copyFromUtf8("{\"minioAccessKeyId\":\"minioadmin\"}"))
-      .build();
+      SecretPayload.newBuilder()
+          .setData(ByteString.copyFromUtf8("{\"minioAccessKeyId\":\"minioadmin\"}"))
+          .build();
 
   private SecretPayload binarySecretValue =
-    SecretPayload.newBuilder()
-      .setData(ByteString.copyFromUtf8("-----BEGIN CERTIFICATE-----"))
-      .build();
+      SecretPayload.newBuilder()
+          .setData(ByteString.copyFromUtf8("-----BEGIN CERTIFICATE-----"))
+          .build();
 
   private SecretPayload secretStringFileValue =
-    SecretPayload.newBuilder()
-      .setData(ByteString.copyFromUtf8("-----BEGIN CERTIFICATE-----"))
-      .build();
+      SecretPayload.newBuilder()
+          .setData(ByteString.copyFromUtf8("-----BEGIN CERTIFICATE-----"))
+          .build();
 
   private SecretPayload kvSecretValue =
-    SecretPayload.newBuilder().setData(ByteString.copyFromUtf8("minioadmin")).build();
+      SecretPayload.newBuilder().setData(ByteString.copyFromUtf8("minioadmin")).build();
 
   private SecretPayload plaintextSecretValue =
-    SecretPayload.newBuilder().setData(ByteString.copyFromUtf8("my-k8s-v2-account-name")).build();
+      SecretPayload.newBuilder().setData(ByteString.copyFromUtf8("my-k8s-v2-account-name")).build();
 
   @Before
   public void setup() {
@@ -68,31 +68,31 @@ public class GoogleSecretsManagerSecretEngineTest {
   @Test
   public void decryptStringWithKey() {
     EncryptedSecret kvSecret =
-      EncryptedSecret.parse(
-        "encrypted:google-secrets-manager!p:824069899151!s:spinnaker-store!k:minioAccessKeyId");
+        EncryptedSecret.parse(
+            "encrypted:google-secrets-manager!p:824069899151!s:spinnaker-store!k:minioAccessKeyId");
     doReturn(minioAccessKeyId)
-      .when(googleSecretsManagerSecretEngine)
-      .getSecretPayload(any(), any());
+        .when(googleSecretsManagerSecretEngine)
+        .getSecretPayload(any(), any());
     assertArrayEquals("minioadmin".getBytes(), googleSecretsManagerSecretEngine.decrypt(kvSecret));
   }
 
   @Test
   public void decryptStringWithoutKey() {
     EncryptedSecret plaintextSecret =
-      EncryptedSecret.parse("encrypted:google-secrets-manager!p:824069899151!s:account-name");
+        EncryptedSecret.parse("encrypted:google-secrets-manager!p:824069899151!s:account-name");
     doReturn(plaintextSecretValue)
-      .when(googleSecretsManagerSecretEngine)
-      .getSecretPayload(any(), any());
+        .when(googleSecretsManagerSecretEngine)
+        .getSecretPayload(any(), any());
     assertArrayEquals(
-      "my-k8s-v2-account-name".getBytes(),
-      googleSecretsManagerSecretEngine.decrypt(plaintextSecret));
+        "my-k8s-v2-account-name".getBytes(),
+        googleSecretsManagerSecretEngine.decrypt(plaintextSecret));
   }
 
   @Test
   public void decryptFileWithKey() {
     EncryptedSecret kvSecret =
-      EncryptedSecret.parse(
-        "encryptedFile:google-secrets-manager!p:824069899151!s:spinnaker-store!k:minioAccessKeyId");
+        EncryptedSecret.parse(
+            "encryptedFile:google-secrets-manager!p:824069899151!s:spinnaker-store!k:minioAccessKeyId");
     exceptionRule.expect(InvalidSecretFormatException.class);
     doReturn(kvSecretValue).when(googleSecretsManagerSecretEngine).getSecretPayload(any(), any());
     googleSecretsManagerSecretEngine.validate(kvSecret);
@@ -101,35 +101,35 @@ public class GoogleSecretsManagerSecretEngineTest {
   @Test
   public void decryptSecretStringAsFile() {
     EncryptedSecret secretStringFile =
-      EncryptedSecret.parse("encryptedFile:google-secrets-manager!p:824069899151!s:certificate");
+        EncryptedSecret.parse("encryptedFile:google-secrets-manager!p:824069899151!s:certificate");
     doReturn(secretStringFileValue)
-      .when(googleSecretsManagerSecretEngine)
-      .getSecretPayload(any(), any());
+        .when(googleSecretsManagerSecretEngine)
+        .getSecretPayload(any(), any());
     assertArrayEquals(
-      "-----BEGIN CERTIFICATE-----".getBytes(),
-      googleSecretsManagerSecretEngine.decrypt(secretStringFile));
+        "-----BEGIN CERTIFICATE-----".getBytes(),
+        googleSecretsManagerSecretEngine.decrypt(secretStringFile));
   }
 
   @Test
   public void decryptSecretBinaryAsFile() {
     EncryptedSecret secretBinaryFile =
-      EncryptedSecret.parse("encryptedFile:google-secrets-manager!p:824069899151!s:certificate");
+        EncryptedSecret.parse("encryptedFile:google-secrets-manager!p:824069899151!s:certificate");
     doReturn(binarySecretValue)
-      .when(googleSecretsManagerSecretEngine)
-      .getSecretPayload(any(), any());
+        .when(googleSecretsManagerSecretEngine)
+        .getSecretPayload(any(), any());
     assertArrayEquals(
-      "-----BEGIN CERTIFICATE-----".getBytes(),
-      googleSecretsManagerSecretEngine.decrypt(secretBinaryFile));
+        "-----BEGIN CERTIFICATE-----".getBytes(),
+        googleSecretsManagerSecretEngine.decrypt(secretBinaryFile));
   }
 
   @Test
   public void decryptStringWithBinaryResult() {
     EncryptedSecret kvSecret =
-      EncryptedSecret.parse(
-        "encrypted:google-secrets-manager!p:824069899151!s:spinnaker-store!k:minioAccessKeyId");
+        EncryptedSecret.parse(
+            "encrypted:google-secrets-manager!p:824069899151!s:spinnaker-store!k:minioAccessKeyId");
     doReturn(binarySecretValue)
-      .when(googleSecretsManagerSecretEngine)
-      .getSecretPayload(any(), any());
+        .when(googleSecretsManagerSecretEngine)
+        .getSecretPayload(any(), any());
     exceptionRule.expect(SecretException.class);
     googleSecretsManagerSecretEngine.decrypt(kvSecret);
   }
