@@ -133,4 +133,16 @@ public class GoogleSecretsManagerSecretEngineTest {
     exceptionRule.expect(SecretException.class);
     googleSecretsManagerSecretEngine.decrypt(kvSecret);
   }
+
+  @Test
+  public void decryptStringWithInvalidParam() {
+    EncryptedSecret kvSecret =
+        EncryptedSecret.parse(
+            "encrypted:google-secrets-manager!j:824069899151!s:spinnaker-store!k:account-name");
+    doReturn(binarySecretValue)
+        .when(googleSecretsManagerSecretEngine)
+        .getSecretPayload(any(), any());
+    exceptionRule.expect(SecretException.class);
+    googleSecretsManagerSecretEngine.decrypt(kvSecret);
+  }
 }
