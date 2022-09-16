@@ -33,6 +33,7 @@ import org.jooq.SQLDialect
  * @param minIdle The minimum number of idle connections to maintain to the database
  * @param maxPoolSize The maximum number of connections to keep in the pool
  * @param default Whether or not this connection pool should be used as the default pool within the application
+ * @param registerMBeans Whether or not this connection pool should register JMX mbeans
  */
 @Suppress("MagicNumber")
 data class ConnectionPoolProperties(
@@ -43,9 +44,10 @@ data class ConnectionPoolProperties(
   var password: String? = null,
   var connectionTimeoutMs: Long = TimeUnit.SECONDS.toMillis(5),
   var validationTimeoutMs: Long = TimeUnit.SECONDS.toMillis(5),
-  var idleTimeoutMs: Long = TimeUnit.MINUTES.toMillis(1),
-  var maxLifetimeMs: Long = TimeUnit.SECONDS.toMillis(30),
+  var idleTimeoutMs: Long = TimeUnit.MINUTES.toMillis(3),
+  var maxLifetimeMs: Long = TimeUnit.MINUTES.toMillis(5),
   var minIdle: Int = 5,
-  var maxPoolSize: Int = 20,
-  var default: Boolean = false
+  var maxPoolSize: Int = 100,
+  var default: Boolean = false,
+  var registerMBeans: Boolean = false
 )
